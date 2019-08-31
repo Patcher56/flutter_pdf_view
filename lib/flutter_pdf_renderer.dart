@@ -5,8 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class FlutterPdfRenderer {
-  static const MethodChannel _channel =
-      MethodChannel('rackberg.flutter_pdf_renderer');
+  static const MethodChannel _channel = MethodChannel('rackberg.flutter_pdf_renderer');
 
   /// Sends the [pdfFile] to the platform which then renders it.
   static Future<List<File>> renderPdf({String pdfFile}) async {
@@ -57,9 +56,14 @@ class _PdfRendererState extends State<PdfRenderer> {
     if (files != null) {
       return SizedBox(
         height: widget.width,
-        child: PageView(
-          children: files.map((f) => Image.file(f)).toList(),
-        ),
+        child: Platform.isIOS
+            ? UiKitView(
+                viewType: 'FlutterPDFView',
+                creationParams: {'path': widget.pdfFile},
+              )
+            : PageView(
+                children: files.map((f) => Image.file(f)).toList(),
+              ),
       );
     }
 

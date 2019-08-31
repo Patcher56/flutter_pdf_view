@@ -1,104 +1,56 @@
 import Flutter
 import UIKit
+import PDFKit
+
+public class FlutterPDFViewFactory : NSObject, FlutterPlatformViewFactory {
+    private let messenger: FlutterBinaryMessenger
+
+    init(messenger: FlutterBinaryMessenger) {
+        self.messenger = messenger
+    }
+
+    public func create(withFrame frame: CGRect, viewIdentifier viewId: Int64, arguments args: Any?) -> FlutterPlatformView {
+        print("arguments \(args ?? "")")
+        return FlutterPDFView(frame, viewId:viewId, args:args)
+    }
+}
+
+public class FlutterPDFView : NSObject, FlutterPlatformView {
+    let frame: CGRect
+
+    init(_ frame: CGRect, viewId: Int64, args: Any?) {
+        self.frame = frame
+        print(args ?? "")
+    }
+
+    public func view() -> UIView {
+        if #available(iOS 11.0, *) {
+            let pdfView = PDFView()
+//            pdfView.document = PDFDocument(url: URL(fileURLWithPath: path))
+//            pdfview.displayMode = PDFDisplayMode.singlePageContinuous
+            pdfView.autoScales = true
+
+            return pdfView
+        } else {
+            let label = UILabel(frame: self.frame)
+            label.text = "No support for iOS < 11.0"
+            return label
+        }
+    }
+
+}
 
 public class SwiftFlutterPdfRendererPlugin: NSObject, FlutterPlugin {
-    
-    private let registrar: FlutterPluginRegistrar;
-    
-    init(registrar: FlutterPluginRegistrar) {
-        self.registrar = registrar
+    private var channel: FlutterMethodChannel!
+
+    init(channel: FlutterMethodChannel) {
+        super.init()
+        self.channel = channel
     }
     
     public static func register(with registrar: FlutterPluginRegistrar) {
-        let channel = FlutterMethodChannel(name: "rackberg.flutter_pdf_renderer", binaryMessenger: registrar.messenger())
-        let instance = SwiftFlutterPdfRendererPlugin(registrar: registrar)
-        registrar.addMethodCallDelegate(instance, channel: channel)
+        let factory = FlutterPDFViewFactory(messenger: registrar.messenger())
+        let viewId = "FlutterPDFView"
+        registrar.register(factory, withId: viewId)
     }
-    
-    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        if (call.method == "renderPdf") {
-            let arguments = call.arguments as! NSDictionary
-            result(getPathsForAllPages(resourcePath: arguments["path"] as! String))
-        }
-    }
-    
-    private func getPathsForAllPages(resourcePath: String) -> [String] {
-        var paths: [String] = [String]()
-        
-        do {
-            let pdfdata = try NSData(contentsOfFile: resourcePath, options: NSData.ReadingOptions.init(rawValue: 0))
-            let pdfData = pdfdata as CFData
-            let provider:CGDataProvider = CGDataProvider(data: pdfData)!
-            let pdfDoc:CGPDFDocument = CGPDFDocument(provider)!
-            let numberOfPages:Int = pdfDoc.numberOfPages
-            for i in 1...numberOfPages {
-                if let renderedPagePath: String = renderPage(pdfDoc: pdfDoc, page: i) {
-                    paths.append(renderedPagePath)
-                }
-            }
-        } catch {
-            // Handle error...
-        }
-        
-        return paths
-    }
-    
-    private func renderPage(pdfDoc:CGPDFDocument, page:Int) -> String? {
-        let pdfPage:CGPDFPage = pdfDoc.page(at: page)!
-        var pageRect:CGRect = pdfPage.getBoxRect(.mediaBox)
-        pageRect.size = CGSize(width: pageRect.size.width, height: pageRect.size.height)
-        
-        UIGraphicsBeginImageContext(pageRect.size)
-        let context: CGContext = UIGraphicsGetCurrentContext()!
-        context.saveGState()
-        context.translateBy(x: 0.0, y: pageRect.size.height)
-        context.scaleBy(x: 1.0, y: -1.0)
-        context.concatenate(pdfPage.getDrawingTransform(.mediaBox, rect: pageRect, rotate: 0, preserveAspectRatio: true))
-        context.drawPDFPage(pdfPage)
-        let pdfImage: UIImage = UIGraphicsGetImageFromCurrentImageContext()!
-        UIGraphicsEndImageContext()
-        
-        if let savedPath = storeImageToTemporaryDirectory(image: pdfImage) {
-            return savedPath.absoluteString.replacingOccurrences(of: "file://", with: "")
-        }
-        
-        return nil
-    }
-    
-    private func storeImageToTemporaryDirectory(image: UIImage) -> URL? {
-        guard let data = image.pngData() else {
-            return nil
-        }
-        let fileURL = TemporaryFileURL(extension: "pdf")
-        do {
-            try data.write(to: fileURL.contentURL)
-            return fileURL.contentURL
-        } catch {
-            return nil
-        }
-    }
-}
-
-public final class TemporaryFileURL: ManagedURL {
-    public let contentURL: URL
-    
-    public init(extension ext: String) {
-        contentURL = URL(fileURLWithPath: NSTemporaryDirectory())
-            .appendingPathComponent(UUID().uuidString)
-            .appendingPathExtension(ext)
-    }
-}
-
-public protocol ManagedURL {
-    var contentURL: URL { get }
-    func keepAlive()
-}
-
-public extension ManagedURL {
-    public func keepAlive() {}
-}
-
-extension URL: ManagedURL {
-    public var contentURL: URL { return self }
-    
 }
