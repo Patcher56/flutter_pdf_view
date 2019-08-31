@@ -10,8 +10,6 @@ public class FlutterPDFViewFactory : NSObject, FlutterPlatformViewFactory {
     }
 
     public func create(withFrame frame: CGRect, viewIdentifier viewId: Int64, arguments args: Any?) -> FlutterPlatformView {
-        print(args ?? "no arguments in factory")
-        print(type(of: args))
         return FlutterPDFView(frame, viewId: viewId, args: (args as? Dictionary<String, Any>)!)
     }
     

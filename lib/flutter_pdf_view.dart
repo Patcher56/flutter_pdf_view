@@ -35,8 +35,10 @@ class _PdfViewState extends State<PdfView> {
               creationParamsCodec: StandardMessageCodec(),
             );
           } else {
-            return PageView(
-              children: <Widget>[],
+            return AndroidView(
+              viewType: 'FlutterPDFView',
+              creationParams: {'path': widget.pdfFile},
+              creationParamsCodec: StandardMessageCodec(),
             );
           }
         },

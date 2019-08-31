@@ -12,6 +12,12 @@ class FlutterPdfViewPlugin: MethodCallHandler {
     fun registerWith(registrar: Registrar) {
       val channel = MethodChannel(registrar.messenger(), "flutter_pdf_view")
       channel.setMethodCallHandler(FlutterPdfViewPlugin())
+
+      // register view
+      registrar
+              .platformViewRegistry()
+              .registerViewFactory(
+                      "FlutterPDFView", FlutterPDFViewFactory(registrar))
     }
   }
 
