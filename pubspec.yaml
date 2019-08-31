@@ -1,8 +1,8 @@
 name: flutter_pdf_view
-description: A new flutter plugin project.
+description: Flutter Plugin to render PDF files natively on both Android and iOS devices. Provides a Widget to render the pages using a PageView.
 version: 0.0.1+1
-author:
-homepage:
+author: Patrick Kuen <p.kuen@cloudacy.io>
+homepage: https://cloudacy.io
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
