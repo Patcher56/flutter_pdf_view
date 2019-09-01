@@ -15,6 +15,7 @@ class FlutterPdfView {
 
 class PdfView extends StatefulWidget {
   final String pdfFile;
+  final MethodChannel _channel = MethodChannel('flutter_pdf_view');
 
   PdfView({@required this.pdfFile});
 
@@ -23,6 +24,13 @@ class PdfView extends StatefulWidget {
 }
 
 class _PdfViewState extends State<PdfView> {
+  @override
+  void initState() {
+    super.initState();
+
+    widget._channel.invokeMethod('openPdfFile', {'path': widget.pdfFile});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -35,11 +43,7 @@ class _PdfViewState extends State<PdfView> {
               creationParamsCodec: StandardMessageCodec(),
             );
           } else {
-            return AndroidView(
-              viewType: 'FlutterPDFView',
-              creationParams: {'path': widget.pdfFile},
-              creationParamsCodec: StandardMessageCodec(),
-            );
+            return Center();
           }
         },
       ),
