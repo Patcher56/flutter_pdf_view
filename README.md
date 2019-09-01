@@ -31,3 +31,9 @@ Becuase this is still not activated by default, you have to insert the following
 <key>io.flutter.embedded_views_preview</key>
 <true/>
 ```
+
+## Additional Information
+This package was forked from [flutter_pdf_renderer](https://github.com/rackberg/flutter_pdf_renderer). Although the Swift and Kotlin implementations are completely different, it helped a lot in developing the plugin. Thanks for that.
+
+## Contributing
+Anyone is welcome to contribute to the package. Just send a Pull Request and I will try to review it as soon as possible.
