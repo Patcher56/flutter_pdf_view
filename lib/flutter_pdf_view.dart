@@ -15,7 +15,6 @@ class FlutterPdfView {
 
 class PdfView extends StatefulWidget {
   final String pdfFile;
-  final MethodChannel _channel = MethodChannel('flutter_pdf_view');
 
   PdfView({@required this.pdfFile});
 
@@ -23,12 +22,19 @@ class PdfView extends StatefulWidget {
   State<StatefulWidget> createState() => _PdfViewState();
 }
 
+void openPdfFile(String path) {
+  if (!Platform.isAndroid) {
+    return;
+  }
+
+  final MethodChannel _channel = MethodChannel('flutter_pdf_view');
+  _channel.invokeMethod('openPdfFile', {'path': path});
+}
+
 class _PdfViewState extends State<PdfView> {
   @override
   void initState() {
     super.initState();
-
-    widget._channel.invokeMethod('openPdfFile', {'path': widget.pdfFile});
   }
 
   @override
@@ -43,7 +49,9 @@ class _PdfViewState extends State<PdfView> {
               creationParamsCodec: StandardMessageCodec(),
             );
           } else {
-            return Center();
+            return Center(
+              child: Text('A embedded pdf viewer is not supported on android.'),
+            );
           }
         },
       ),
