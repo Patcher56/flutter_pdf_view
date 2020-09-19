@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.example.flutter_pdf_view">
+  package="io.cloudacy.flutter_pdf_view">
     <application>
         <provider
             android:name="androidx.core.content.FileProvider"

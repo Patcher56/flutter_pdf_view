@@ -1,4 +1,4 @@
-package com.example.flutter_pdf_view_example
+package io.cloudacy.flutter_pdf_view_example
 
 import android.os.Bundle
 
