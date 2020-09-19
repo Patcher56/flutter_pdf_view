@@ -16,11 +16,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   Future<String> downloadedFilePath;
   TextEditingController controller = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-  }
+  DefaultCacheManager cacheManager = DefaultCacheManager();
 
   void download() {
     setState(() {
@@ -29,7 +25,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<String> downloadPdfFile(String url) async {
-    File fetchedFile = await DefaultCacheManager().getSingleFile(url);
+    File fetchedFile = await cacheManager.getSingleFile(url);
     return fetchedFile.path;
   }
 
